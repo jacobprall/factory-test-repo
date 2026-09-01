@@ -21,6 +21,19 @@ describe("capitalize", () => {
   it("does not change the rest of the string", () => {
     expect(capitalize("hello World")).toBe("Hello World");
   });
+
+  it("leaves strings starting with a digit unchanged", () => {
+    expect(capitalize("9test")).toBe("9test");
+  });
+
+  it("leaves strings starting with a symbol unchanged", () => {
+    expect(capitalize("@hello")).toBe("@hello");
+    expect(capitalize(" hello")).toBe(" hello");
+  });
+
+  it("uppercases an accented first letter", () => {
+    expect(capitalize("élan")).toBe("Élan");
+  });
 });
 
 describe("slugify", () => {
@@ -51,6 +64,32 @@ describe("slugify", () => {
   it("keeps digits", () => {
     expect(slugify("Top 10 Tips")).toBe("top-10-tips");
   });
+
+  it("keeps digit-only input intact", () => {
+    expect(slugify("123")).toBe("123");
+    expect(slugify("2024 07")).toBe("2024-07");
+  });
+
+  it("strips underscores", () => {
+    expect(slugify("hello_world")).toBe("helloworld");
+    expect(slugify("hello _ world")).toBe("hello-world");
+  });
+
+  it("strips accented characters rather than transliterating them", () => {
+    expect(slugify("café")).toBe("caf");
+    expect(slugify("naïve idea")).toBe("nave-idea");
+  });
+
+  it("strips non-Latin characters", () => {
+    expect(slugify("Москва")).toBe("");
+    expect(slugify("Москва 2024")).toBe("2024");
+  });
+
+  it("returns an empty string for punctuation-only input", () => {
+    expect(slugify("!!!")).toBe("");
+    expect(slugify("@#$%")).toBe("");
+    expect(slugify("   ")).toBe("");
+  });
 });
 
 describe("truncate", () => {
@@ -77,6 +116,13 @@ describe("truncate", () => {
 
   it("returns only the ellipsis when maxLength is zero or negative", () => {
     expect(truncate("Hello", 0)).toBe("...");
+    expect(truncate("Hello", -1)).toBe("...");
     expect(truncate("Hello", -3)).toBe("...");
+    expect(truncate("Hello", -5)).toBe("...");
+    expect(truncate("Hello", -100)).toBe("...");
+  });
+
+  it("returns only the ellipsis for empty input with a negative maxLength", () => {
+    expect(truncate("", -1)).toBe("...");
   });
 });
