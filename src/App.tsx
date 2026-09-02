@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "./useTheme";
 
 interface Todo {
   id: number;
@@ -9,6 +10,7 @@ interface Todo {
 export default function App() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState("");
+  const { theme, toggleTheme } = useTheme();
 
   const add = () => {
     const text = input.trim();
@@ -27,7 +29,20 @@ export default function App() {
 
   return (
     <div className="app">
-      <h1>Todos</h1>
+      <header className="app-header">
+        <h1>Todos</h1>
+        <button
+          type="button"
+          className="theme-toggle"
+          onClick={toggleTheme}
+          aria-label={
+            theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
+          }
+          aria-pressed={theme === "dark"}
+        >
+          {theme === "dark" ? "☀" : "🌙"}
+        </button>
+      </header>
       <div className="add-row">
         <input
           value={input}
