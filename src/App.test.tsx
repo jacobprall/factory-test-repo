@@ -32,6 +32,8 @@ function mockMatchMedia(initialMatches: boolean) {
   };
 }
 
+const originalMatchMedia = window.matchMedia;
+
 beforeEach(() => {
   localStorage.clear();
   document.documentElement.removeAttribute("data-theme");
@@ -40,6 +42,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  window.matchMedia = originalMatchMedia;
 });
 
 describe("App", () => {
@@ -54,6 +57,16 @@ describe("App", () => {
     expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
     expect(
       screen.getByRole("button", { name: "Switch to light theme" }),
+    ).toBeTruthy();
+  });
+
+  it("defaults to light when the OS prefers light", () => {
+    mockMatchMedia(false);
+    render(<App />);
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+    expect(
+      screen.getByRole("button", { name: "Switch to dark theme" }),
     ).toBeTruthy();
   });
 
@@ -94,5 +107,88 @@ describe("App", () => {
     expect(
       screen.getByRole("button", { name: "Switch to light theme" }),
     ).toBeTruthy();
+  });
+
+  it("persists an explicit light choice made against a dark OS preference", () => {
+    const { fireChange } = mockMatchMedia(true);
+    const { unmount } = render(<App />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Switch to light theme" }),
+    );
+    expect(localStorage.getItem("theme")).toBe("light");
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+
+    unmount();
+    cleanup();
+
+    render(<App />);
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+
+    // The OS flips back to dark, but the explicit light choice must win.
+    fireChange(true);
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+    const button = screen.getByRole("button", {
+      name: "Switch to dark theme",
+    });
+    expect(button.getAttribute("aria-pressed")).toBe("false");
+  });
+
+  it("ignores a corrupt saved value and falls back to the OS preference", () => {
+    localStorage.setItem("theme", "banana");
+    const { fireChange } = mockMatchMedia(true);
+    render(<App />);
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+
+    // No valid saved choice means the OS is still followed.
+    fireChange(false);
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+  });
+
+  it("still renders and toggles when localStorage reads throw", () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("storage blocked");
+    });
+    mockMatchMedia(false);
+    render(<App />);
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Switch to dark theme" }),
+    );
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+  });
+
+  it("still toggles when localStorage writes throw", () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("quota exceeded");
+    });
+    mockMatchMedia(false);
+    render(<App />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Switch to dark theme" }),
+    );
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    expect(
+      screen.getByRole("button", { name: "Switch to light theme" }),
+    ).toBeTruthy();
+  });
+
+  it("falls back to light when matchMedia is unavailable", () => {
+    // @ts-expect-error deliberately simulating an environment without matchMedia
+    window.matchMedia = undefined;
+    render(<App />);
+
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Switch to dark theme" }),
+    );
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    expect(localStorage.getItem("theme")).toBe("dark");
   });
 });

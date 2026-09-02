@@ -39,7 +39,8 @@ export function useTheme() {
   useEffect(() => {
     // Follow the OS only while the user has made no explicit choice.
     if (explicit) return;
-    const mql = window.matchMedia(DARK_QUERY);
+    const mql = window.matchMedia?.(DARK_QUERY);
+    if (!mql) return;
     const onChange = (e: MediaQueryListEvent) =>
       setTheme(e.matches ? "dark" : "light");
     mql.addEventListener("change", onChange);
@@ -47,13 +48,13 @@ export function useTheme() {
   }, [explicit]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next: Theme = prev === "dark" ? "light" : "dark";
-      writeStoredTheme(next);
-      return next;
-    });
+    // Persist outside the state updater: updaters must stay pure because
+    // React may invoke them more than once per render.
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    writeStoredTheme(next);
+    setTheme(next);
     setExplicit(true);
-  }, []);
+  }, [theme]);
 
   return { theme, toggleTheme };
 }
