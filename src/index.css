@@ -28,12 +28,14 @@ h1 {
 
 .add-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .add-row input {
   flex: 1;
+  min-width: 0;
   padding: 0.5rem 0.75rem;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -50,6 +52,34 @@ h1 {
   cursor: pointer;
 }
 
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.filter-btn {
+  padding: 0.35rem 0.75rem;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  color: #555;
+  cursor: pointer;
+}
+
+.filter-btn:hover {
+  border-color: #4361ee;
+  color: #4361ee;
+}
+
+.filter-btn[aria-pressed="true"] {
+  background: #4361ee;
+  border-color: #4361ee;
+  color: #fff;
+}
+
 ul {
   list-style: none;
   padding: 0;
@@ -59,12 +89,30 @@ li {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   padding: 0.6rem 0;
   border-bottom: 1px solid #eee;
 }
 
-li span {
+li label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
   cursor: pointer;
+}
+
+li input[type="checkbox"] {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  accent-color: #4361ee;
+  cursor: pointer;
+}
+
+li span {
+  overflow-wrap: anywhere;
 }
 
 li.done span {
@@ -73,9 +121,11 @@ li.done span {
 }
 
 li button {
+  flex: none;
   background: none;
   border: none;
   font-size: 1.25rem;
+  line-height: 1;
   color: #aaa;
   cursor: pointer;
 }
@@ -84,8 +134,48 @@ li button:hover {
   color: #e63946;
 }
 
-.count {
+.empty-state {
+  color: #888;
+  font-size: 0.9375rem;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   margin-top: 1rem;
+}
+
+.count {
   font-size: 0.875rem;
   color: #888;
+}
+
+.clear-completed {
+  padding: 0.35rem 0.75rem;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #555;
+  cursor: pointer;
+}
+
+.clear-completed:hover:not(:disabled) {
+  border-color: #e63946;
+  color: #e63946;
+}
+
+.clear-completed:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 2px solid #4361ee;
+  outline-offset: 2px;
 }
