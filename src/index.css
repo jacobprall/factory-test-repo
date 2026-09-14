@@ -50,6 +50,61 @@ h1 {
   cursor: pointer;
 }
 
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.filters {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.35rem 0.75rem;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.filter-btn:hover {
+  border-color: #4361ee;
+}
+
+.filter-btn.active {
+  background: #4361ee;
+  border-color: #4361ee;
+  color: white;
+}
+
+.clear-completed {
+  padding: 0.35rem 0.75rem;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #e63946;
+  cursor: pointer;
+}
+
+.clear-completed:hover:not(:disabled) {
+  background: #fdecee;
+}
+
+.clear-completed:disabled {
+  color: #bbb;
+  border-color: #eee;
+  cursor: not-allowed;
+}
+
 ul {
   list-style: none;
   padding: 0;
@@ -64,7 +119,9 @@ li {
 }
 
 li span {
-  cursor: pointer;
+  flex: 1;
+  margin: 0 0.5rem;
+  word-break: break-word;
 }
 
 li.done span {
@@ -84,8 +141,30 @@ li button:hover {
   color: #e63946;
 }
 
+.empty-state {
+  padding: 1.5rem 0;
+  text-align: center;
+  color: #888;
+  font-size: 0.9375rem;
+}
+
 .count {
   margin-top: 1rem;
   font-size: 0.875rem;
   color: #888;
+}
+
+@media (max-width: 480px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters {
+    justify-content: center;
+  }
+
+  .clear-completed {
+    width: 100%;
+  }
 }
