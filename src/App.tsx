@@ -1,5 +1,9 @@
 import { useState } from "react";
 
+export function remainingLabel(count: number): string {
+  return count === 1 ? "1 item left" : `${count} items left`;
+}
+
 interface Todo {
   id: number;
   text: string;
@@ -47,7 +51,7 @@ export default function App() {
       </ul>
       {todos.length > 0 && (
         <p className="count">
-          {todos.filter((t) => !t.done).length} remaining
+          {remainingLabel(todos.filter((t) => !t.done).length)}
         </p>
       )}
     </div>
